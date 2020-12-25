@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "btfnpz-helper"
+version = "0.1.0"
+description = ".btf.npz file helper"
+authors = ["2-propanol <nuclear.fusion.247@gmail.com>"]
+license = "zlib"
+
+[tool.poetry.dependencies]
+python = "^3.7"
+numpy = "^1.19"
+
+[tool.poetry.dev-dependencies]
+black = "^20.8b1"
+ptpython = "^3.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
