@@ -1,13 +1,13 @@
 [tool.poetry]
-name = "btfnpz-helper"
-version = "0.1.0"
-description = ".btf.npz file helper."
+name = "btf_helper"
+version = "0.2.0"
+description = "Extract home-brewed BTF format."
 authors = ["2-propanol <nuclear.fusion.247@gmail.com>"]
 readme = "README.md"
 homepage = "https://github.com/2-propanol/btfnpz_helper"
 license = "zlib license"
 packages = [
-    { include = "btf_extractor"},
+    { include = "btf_helper"},
 ]
 
 [tool.poetry.dependencies]

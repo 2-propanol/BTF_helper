@@ -1,17 +1,17 @@
-# .btf.npz helper
-Extract .btf.npz archive format.
+# BTF helper
+Extract home-brewed BTF format.
 
 Extract to ndarray compatible with openCV(BGR, channels-last).
 
 
 ## Install
 ```bash
-pip install git+https://github.com/2-propanol/btfnpz_helper
+pip install git+https://github.com/2-propanol/BTF_helper
 ```
 
 ## Example
 ```python
->>> from btfnpz import Btfnpz
+>>> from btf_helper import Btfnpz
 
 >>> btf = Btfnpz("sample.zip")
 >>> print(btf.img_shape)
