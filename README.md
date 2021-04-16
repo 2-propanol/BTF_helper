@@ -13,7 +13,7 @@ pip install git+https://github.com/2-propanol/BTF_helper
 ```python
 >>> from btf_helper import Btfnpz
 
->>> btf = Btfnpz("sample.zip")
+>>> btf = Btfnpz("example.zip")
 >>> print(btf.img_shape)
 (512, 512, 3)
 >>> angles_list = list(btf.angles_set)
