@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "btf_helper"
-version = "0.2.0"
+version = "0.3.0"
 description = "Extract home-brewed BTF format."
 authors = ["2-propanol <nuclear.fusion.247@gmail.com>"]
 readme = "README.md"
@@ -13,11 +13,10 @@ packages = [
 [tool.poetry.dependencies]
 python = "^3.7"
 numpy = "^1.19"
-Pillow = "^8"
 tqdm = "^4"
 
 [tool.poetry.dev-dependencies]
-black = "^20.8b1"
+black = "^21.4b2"
 ptpython = "^3"
 
 [build-system]
