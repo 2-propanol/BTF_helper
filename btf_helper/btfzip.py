@@ -5,6 +5,7 @@ from zipfile import ZipFile
 
 import cv2
 import numpy as np
+from simplejpeg import decode_jpeg
 
 AnglesTuple = Tuple[float, float, float, float]
 
@@ -69,6 +70,11 @@ class Btfzip:
                     )
             raise RuntimeError(f"'{self.zip_filepath}' has duplicated conditions.")
 
+        if file_ext == ".jpg" or file_ext == ".jpeg":
+            self.angles_to_image = self.angles_to_image_simplejpeg
+        else:
+            self.angles_to_image = self.angles_to_image_cv2
+
     @staticmethod
     def _filename_to_angles(filename: str, sep: str) -> AnglesTuple:
         """ファイル名(orパス)から角度(`int`)のタプル(`tl`, `pl`, `tv`, `pv`)を取得する"""
@@ -82,7 +88,7 @@ class Btfzip:
             raise ValueError("invalid angle:", angles) from e
         return (tl, pl, tv, pv)
 
-    def angles_to_image(self, tl: int, pl: int, tv: int, pv: int) -> np.ndarray:
+    def angles_to_image_cv2(self, tl: int, pl: int, tv: int, pv: int) -> np.ndarray:
         """`tl`, `pl`, `tv`, `pv`の角度条件の画像をndarray形式で返す
 
         `filename`が含まれるファイルが存在しない場合は`ValueError`を投げる。
@@ -99,3 +105,20 @@ class Btfzip:
                 np.frombuffer(f.read(), np.uint8),
                 cv2.IMREAD_ANYDEPTH + cv2.IMREAD_ANYCOLOR,
             )
+
+    def angles_to_image_simplejpeg(
+        self, tl: int, pl: int, tv: int, pv: int
+    ) -> np.ndarray:
+        """`tl`, `pl`, `tv`, `pv`の角度条件の画像をndarray形式で返す
+
+        `filename`が含まれるファイルが存在しない場合は`ValueError`を投げる。
+        """
+        key = (tl, pl, tv, pv)
+        filepath = self.__angles_vs_filepath_dict.get(key)
+        if not filepath:
+            raise ValueError(
+                f"Condition {key} does not exist in '{self.zip_filepath}'."
+            )
+
+        with self.__z.open(filepath) as f:
+            return decode_jpeg(f.read(), colorspace="BGR")
