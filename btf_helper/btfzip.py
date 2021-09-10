@@ -7,11 +7,15 @@ import cv2
 import numpy as np
 from simplejpeg import decode_jpeg
 
-AnglesTuple = Tuple[float, float, float, float]
+# PEP484 -- Type Hints:
+#   Type Definition Syntax:
+#     The numeric tower:
+#       when an argument is annotated as having type `float`,
+#       an argument of type `int` is acceptable
 
 
 class Btfzip:
-    """画像ファイルを格納したzipファイルから角度と画像を取り出す（小数点角度と画像形式対応）
+    """画像ファイルを格納したzipファイルから角度と画像を取り出す（小数点角度と画像拡張子指定対応）
 
     角度は全て度数法(degree)を用いている。
     zipファイルに含まれる角度情報の順番は保証せず、並べ替えもしない。
@@ -71,13 +75,15 @@ class Btfzip:
             raise RuntimeError(f"'{self.zip_filepath}' has duplicated conditions.")
 
         if file_ext == ".jpg" or file_ext == ".jpeg":
-            self.angles_to_image = self.angles_to_image_simplejpeg
+            self.angles_to_image = self._angles_to_image_simplejpeg
         else:
-            self.angles_to_image = self.angles_to_image_cv2
+            self.angles_to_image = self._angles_to_image_cv2
 
     @staticmethod
-    def _filename_to_angles(filename: str, sep: str) -> AnglesTuple:
-        """ファイル名(orパス)から角度(`int`)のタプル(`tl`, `pl`, `tv`, `pv`)を取得する"""
+    def _filename_to_angles(
+        filename: str, sep: str
+    ) -> Tuple[float, float, float, float]:
+        """ファイル名(orパス)から角度(`float`)のタプル(`tl`, `pl`, `tv`, `pv`)を取得する"""
         angles = filename.split("/")[-1][:-4].split(sep)
         try:
             tl = float(angles[0][2:])
@@ -88,7 +94,9 @@ class Btfzip:
             raise ValueError("invalid angle:", angles) from e
         return (tl, pl, tv, pv)
 
-    def angles_to_image_cv2(self, tl: int, pl: int, tv: int, pv: int) -> np.ndarray:
+    def _angles_to_image_cv2(
+        self, tl: float, pl: float, tv: float, pv: float
+    ) -> np.ndarray:
         """`tl`, `pl`, `tv`, `pv`の角度条件の画像をndarray形式で返す
 
         `filename`が含まれるファイルが存在しない場合は`ValueError`を投げる。
@@ -106,8 +114,8 @@ class Btfzip:
                 cv2.IMREAD_ANYDEPTH + cv2.IMREAD_ANYCOLOR,
             )
 
-    def angles_to_image_simplejpeg(
-        self, tl: int, pl: int, tv: int, pv: int
+    def _angles_to_image_simplejpeg(
+        self, tl: float, pl: float, tv: float, pv: float
     ) -> np.ndarray:
         """`tl`, `pl`, `tv`, `pv`の角度条件の画像をndarray形式で返す
 
