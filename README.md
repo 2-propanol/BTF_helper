@@ -33,3 +33,8 @@ pip install git+https://github.com/2-propanol/BTF_helper
 >>> print(angles_list[0])
 (15.0, 0.0, 0.0, 0.0)
 ```
+
+## Other utilities
+### Downsampling
+[Gist :downsampling.py](https://gist.github.com/2-propanol/177fe97b9169e28a9498a2a4ab849a8a)
+> Create a new `.btfzip` containing the resized and cropped BTF data from another `.btfzip`.

@@ -1,4 +1,5 @@
 from collections import Counter
+from decimal import Decimal
 from sys import stderr
 from typing import Tuple
 from zipfile import ZipFile
@@ -24,7 +25,7 @@ class Btfzip:
     画像の実体はopencvと互換性のあるndarray形式(BGR, channels-last)で出力する。
 
     zipファイル要件:
-        "tl{float}{angle_sep}pl{float}{angle_sep}tv{float}{angle_sep}pv{float}.{file_ext}"
+        f"tl{float}{angle_sep}pl{float}{angle_sep}tv{float}{angle_sep}pv{float}.{file_ext}"
         を格納している。
         例) "tl20.25_pl10_tv11.5_pv0.exr"
 
@@ -34,7 +35,7 @@ class Btfzip:
             zipファイルに含まれる画像の角度条件の集合。
 
     Example:
-        >>> btf = ExrInZip("Colorchecker.zip")
+        >>> btf = Btfzip("Colorchecker.zip")
         >>> angles_list = list(btf.angles_set)
         >>> image = btf.angles_to_image(*angles_list[0])
         >>> print(image.shape)
@@ -53,6 +54,8 @@ class Btfzip:
         """
         self.zip_filepath = zip_filepath
         self.__z = ZipFile(zip_filepath)
+        # NOTE: ARIES4軸ステージの分解能は0.001度
+        self.DECIMAL_PRECISION = Decimal("1E-3")
 
         # ファイルパスは重複しないので`filepath_set`はsetで良い
         filepath_set = {path for path in self.__z.namelist() if path.endswith(file_ext)}
@@ -79,17 +82,16 @@ class Btfzip:
         else:
             self.angles_to_image = self._angles_to_image_cv2
 
-    @staticmethod
     def _filename_to_angles(
-        filename: str, sep: str
-    ) -> Tuple[float, float, float, float]:
-        """ファイル名(orパス)から角度(`float`)のタプル(`tl`, `pl`, `tv`, `pv`)を取得する"""
+        self, filename: str, sep: str
+    ) -> Tuple[Decimal, Decimal, Decimal, Decimal]:
+        """ファイル名(orパス)から角度(`Decimal`)のタプル(`tl`, `pl`, `tv`, `pv`)を取得する"""
         angles = filename.split("/")[-1][:-4].split(sep)
         try:
-            tl = float(angles[0][2:])
-            pl = float(angles[1][2:])
-            tv = float(angles[2][2:])
-            pv = float(angles[3][2:])
+            tl = Decimal(angles[0][2:]).quantize(self.DECIMAL_PRECISION)
+            pl = Decimal(angles[1][2:]).quantize(self.DECIMAL_PRECISION)
+            tv = Decimal(angles[2][2:]).quantize(self.DECIMAL_PRECISION)
+            pv = Decimal(angles[3][2:]).quantize(self.DECIMAL_PRECISION)
         except ValueError as e:
             raise ValueError("invalid angle:", angles) from e
         return (tl, pl, tv, pv)
@@ -101,7 +103,12 @@ class Btfzip:
 
         `filename`が含まれるファイルが存在しない場合は`ValueError`を投げる。
         """
-        key = (tl, pl, tv, pv)
+        key = (
+            Decimal(tl).quantize(self.DECIMAL_PRECISION),
+            Decimal(pl).quantize(self.DECIMAL_PRECISION),
+            Decimal(tv).quantize(self.DECIMAL_PRECISION),
+            Decimal(pv).quantize(self.DECIMAL_PRECISION),
+        )
         filepath = self.__angles_vs_filepath_dict.get(key)
         if not filepath:
             raise ValueError(
@@ -121,7 +128,12 @@ class Btfzip:
 
         `filename`が含まれるファイルが存在しない場合は`ValueError`を投げる。
         """
-        key = (tl, pl, tv, pv)
+        key = (
+            Decimal(tl).quantize(self.DECIMAL_PRECISION),
+            Decimal(pl).quantize(self.DECIMAL_PRECISION),
+            Decimal(tv).quantize(self.DECIMAL_PRECISION),
+            Decimal(pv).quantize(self.DECIMAL_PRECISION),
+        )
         filepath = self.__angles_vs_filepath_dict.get(key)
         if not filepath:
             raise ValueError(

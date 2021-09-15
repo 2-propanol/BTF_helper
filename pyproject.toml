@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "btf_helper"
-version = "0.4.0"
+version = "0.5.0"
 description = "Extract home-brewed BTF format."
 authors = ["2-propanol <nuclear.fusion.247@gmail.com>"]
 readme = "README.md"
